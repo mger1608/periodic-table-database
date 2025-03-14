@@ -11,6 +11,7 @@ fi
 
 # Store the input argument
 INPUT=$1
+# echo "Input received: $INPUT"
 
 # Query the database for the element based on atomic_number, symbol, or name
 ELEMENT_INFO=$($PSQL "SELECT e.atomic_number, e.symbol, e.name, t.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius 
@@ -18,6 +19,7 @@ ELEMENT_INFO=$($PSQL "SELECT e.atomic_number, e.symbol, e.name, t.type, p.atomic
                       JOIN properties p ON e.atomic_number = p.atomic_number 
                       JOIN types t ON p.type_id = t.type_id 
                       WHERE e.atomic_number::TEXT = '$INPUT' OR e.symbol = '$INPUT' OR e.name = '$INPUT';")
+# echo "Query result: '$ELEMENT_INFO'"
 
 # Check if the element was found
 if [ -z "$ELEMENT_INFO" ]; then
@@ -25,6 +27,7 @@ if [ -z "$ELEMENT_INFO" ]; then
 else
   # Split the result into variables
   IFS='|' read -r ATOMIC_NUMBER SYMBOL NAME TYPE MASS MELTING BOILING <<< "$ELEMENT_INFO"
+ #  echo "Parsed: $ATOMIC_NUMBER, $SYMBOL, $NAME, $TYPE, $MASS, $MELTING, $BOILING"
   
   # Remove trailing zeros from atomic_mass
   MASS=$(echo $MASS | sed 's/\(\.[0-9]*[1-9]\)0*$/\1/; s/\.$//')
